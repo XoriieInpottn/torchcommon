@@ -10,4 +10,4 @@ from .attention import DotProductAttention
 from .attention import MLPAttention
 
 from .normalization import LayerNorm
-from .normalization import GroupNorm
+from .normalization import AdaptiveGroupNorm
