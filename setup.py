@@ -13,7 +13,7 @@ if __name__ == '__main__':
             'torchcommon.optim',
             'torchcommon.utils',
         ],
-        version='0.4.0',
+        version='0.4.1',
         keywords=['pytorch', 'utilities'],
         description='Pytorch common utilities.',
         long_description_content_type='text/markdown',
