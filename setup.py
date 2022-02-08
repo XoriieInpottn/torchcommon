@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from setuptools import setup
-import torchcommon
 
 if __name__ == '__main__':
     with open('README.md') as file:
@@ -12,8 +11,9 @@ if __name__ == '__main__':
             'torchcommon',
             'torchcommon.nn',
             'torchcommon.optim',
+            'torchcommon.utils',
         ],
-        version='0.3.2',
+        version='0.4.0',
         keywords=['pytorch', 'utilities'],
         description='Pytorch common utilities.',
         long_description_content_type='text/markdown',
