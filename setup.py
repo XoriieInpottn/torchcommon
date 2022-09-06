@@ -14,7 +14,7 @@ if __name__ == '__main__':
             'torchcommon.utils',
             'torchcommon.utils.metrics',
         ],
-        version='0.5.0',
+        version='0.5.1',
         keywords=['pytorch', 'utilities'],
         description='Pytorch common utilities.',
         long_description_content_type='text/markdown',
