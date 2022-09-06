@@ -12,7 +12,7 @@ if __name__ == '__main__':
             'torchcommon.nn',
             'torchcommon.optim',
             'torchcommon.utils',
-            'torchcommon.metrics',
+            'torchcommon.utils.metrics',
         ],
         version='0.5.0',
         keywords=['pytorch', 'utilities'],
