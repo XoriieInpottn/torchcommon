@@ -13,7 +13,7 @@ if __name__ == '__main__':
             'torchcommon.optim',
             'torchcommon.utils',
         ],
-        version='0.4.1',
+        version='0.5.0',
         keywords=['pytorch', 'utilities'],
         description='Pytorch common utilities.',
         long_description_content_type='text/markdown',
@@ -24,14 +24,17 @@ if __name__ == '__main__':
         url='https://github.com/XoriieInpottn/torchcommon',
         platforms='any',
         classifiers=[
-            'Programming Language :: Python :: 3.6',
-            'Programming Language :: Python :: 3.7',
             'Programming Language :: Python :: 3.8',
+            'Programming Language :: Python :: 3.9',
+            'Programming Language :: Python :: 3.10',
         ],
         include_package_data=True,
         zip_safe=True,
         install_requires=[
             'torch',
-            'numpy'
+            'numpy',
+            'imgaug',
+            'opencv-python',
+            'sklearn'
         ]
     )
