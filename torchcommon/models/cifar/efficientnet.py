@@ -9,6 +9,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+__all__ = [
+    'efficientnetb0'
+]
+
 
 def swish(x):
     return x * x.sigmoid()
@@ -162,7 +166,7 @@ class EfficientNet(nn.Module):
         return out
 
 
-def EfficientNetB0(num_classes):
+def efficientnetb0(num_classes):
     cfg = {
         'num_blocks': [1, 2, 2, 3, 3, 4, 1],
         'expansion': [1, 6, 6, 6, 6, 6, 6],

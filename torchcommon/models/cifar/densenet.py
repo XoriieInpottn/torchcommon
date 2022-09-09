@@ -6,6 +6,14 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+__all__ = [
+    'densenet121',
+    'densenet169',
+    'densenet201',
+    'densenet161',
+    'densenet_cifar'
+]
+
 
 class Bottleneck(nn.Module):
     def __init__(self, in_planes, growth_rate):
@@ -89,19 +97,19 @@ class DenseNet(nn.Module):
         return out
 
 
-def DenseNet121(num_classes):
+def densenet121(num_classes):
     return DenseNet(Bottleneck, [6, 12, 24, 16], growth_rate=32, num_classes=num_classes)
 
 
-def DenseNet169(num_classes):
+def densenet169(num_classes):
     return DenseNet(Bottleneck, [6, 12, 32, 32], growth_rate=32, num_classes=num_classes)
 
 
-def DenseNet201(num_classes):
+def densenet201(num_classes):
     return DenseNet(Bottleneck, [6, 12, 48, 32], growth_rate=32, num_classes=num_classes)
 
 
-def DenseNet161(num_classes):
+def densenet161(num_classes):
     return DenseNet(Bottleneck, [6, 12, 36, 24], growth_rate=48, num_classes=num_classes)
 
 
