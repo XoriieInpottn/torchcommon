@@ -2,4 +2,4 @@
 
 from .cls import *
 from .objdet import *
-from semseg import *
+from .semseg import *
