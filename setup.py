@@ -13,8 +13,11 @@ if __name__ == '__main__':
             'torchcommon.optim',
             'torchcommon.utils',
             'torchcommon.utils.metrics',
+            'torchcommon.models',
+            'torchcommon.models.cifar',
+            'torchcommon.models.imagenet'
         ],
-        version='0.5.2',
+        version='0.6.0',
         keywords=['pytorch', 'utilities'],
         description='Pytorch common utilities.',
         long_description_content_type='text/markdown',
