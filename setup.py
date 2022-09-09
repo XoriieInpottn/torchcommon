@@ -17,7 +17,7 @@ if __name__ == '__main__':
             'torchcommon.models.cifar',
             'torchcommon.models.imagenet'
         ],
-        version='0.6.3',
+        version='0.6.4',
         keywords=['pytorch', 'utilities'],
         description='Pytorch common utilities.',
         long_description_content_type='text/markdown',
