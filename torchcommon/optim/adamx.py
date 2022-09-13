@@ -89,7 +89,7 @@ class AdamX(Optimizer):
                 gamma = group['gamma']
                 belief = (grad - exp_avg).square_()
                 belief = belief.mul_(gamma).add_(grad.square(), alpha=1 - gamma)
-                exp_avg_sq.mul_(beta2).add_(belief, alpha=1 - beta2).add_(group['eps'])
+                exp_avg_sq.mul_(beta2).add_(belief, alpha=1 - beta2)
                 if amsgrad:
                     max_exp_avg_sq = state['max_exp_avg_sq']
                     # Maintains the maximum of all 2nd moment running avg. till now
