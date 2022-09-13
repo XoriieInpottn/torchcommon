@@ -15,7 +15,7 @@ class AdamX(Optimizer):
             betas=(0.9, 0.999),
             eps=1e-8,
             weight_decay=0.3,
-            bound=2.0,
+            gamma=0.8,
             amsgrad=False
     ) -> None:
         if not 0.0 <= lr:
@@ -28,7 +28,7 @@ class AdamX(Optimizer):
             raise ValueError("Invalid beta parameter at index 1: {}".format(betas[1]))
         if not 0.0 <= weight_decay:
             raise ValueError("Invalid weight_decay value: {}".format(weight_decay))
-        defaults = dict(lr=lr, betas=betas, eps=eps, weight_decay=weight_decay, amsgrad=amsgrad, bound=bound)
+        defaults = dict(lr=lr, betas=betas, eps=eps, weight_decay=weight_decay, amsgrad=amsgrad, gamma=gamma)
         super(AdamX, self).__init__(params, defaults)
 
     def __setstate__(self, state):
@@ -86,8 +86,9 @@ class AdamX(Optimizer):
                 # Decay the first and second moment running average coefficient
                 exp_avg.mul_(beta1).add_(grad, alpha=1 - beta1)
 
-                brief = (grad - exp_avg).square_().add_(grad.square().div_(group['bound']))
-                exp_avg_sq.mul_(beta2).add_(brief, alpha=1 - beta2).add_(group['eps'])
+                belief = (grad - exp_avg).square_()
+                belief = belief.add_(grad.square(), alpha=group['gamma'])
+                exp_avg_sq.mul_(beta2).add_(belief, alpha=1 - beta2).add_(group['eps'])
                 if amsgrad:
                     max_exp_avg_sq = state['max_exp_avg_sq']
                     # Maintains the maximum of all 2nd moment running avg. till now
