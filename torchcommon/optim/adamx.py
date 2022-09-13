@@ -86,8 +86,9 @@ class AdamX(Optimizer):
                 # Decay the first and second moment running average coefficient
                 exp_avg.mul_(beta1).add_(grad, alpha=1 - beta1)
 
+                gamma = group['gamma']
                 belief = (grad - exp_avg).square_()
-                belief = belief.add_(grad.square(), alpha=group['gamma'])
+                belief = belief.mul_(gamma).add_(grad.square(), alpha=1 - gamma)
                 exp_avg_sq.mul_(beta2).add_(belief, alpha=1 - beta2).add_(group['eps'])
                 if amsgrad:
                     max_exp_avg_sq = state['max_exp_avg_sq']
