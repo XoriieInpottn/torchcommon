@@ -86,7 +86,7 @@ class AdamBelief(Optimizer):
                 exp_avg.mul_(beta1).add_(grad, alpha=1 - beta1)
 
                 brief = (grad - exp_avg).square_()
-                exp_avg_sq.mul_(beta2).add_(brief, alpha=1 - beta2).add_(group['eps'])
+                exp_avg_sq.mul_(beta2).add_(brief, alpha=1 - beta2)
                 if amsgrad:
                     max_exp_avg_sq = state['max_exp_avg_sq']
                     # Maintains the maximum of all 2nd moment running avg. till now

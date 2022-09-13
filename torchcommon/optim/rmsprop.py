@@ -51,7 +51,7 @@ class RMSpropW(Optimizer):
             alpha=alpha,
             eps=eps,
             centered=centered,
-            weight_decay=weight_decay * 0.5
+            weight_decay=weight_decay
         )
         super(RMSpropW, self).__init__(params, defaults)
 
@@ -116,8 +116,5 @@ class RMSpropW(Optimizer):
                     p.add_(buf, alpha=-group['lr'])
                 else:
                     p.addcdiv_(grad, avg, value=-group['lr'])
-
-                # Perform stepweight decay
-                p.mul_(1 - group['lr'] * group['weight_decay'])
 
         return loss

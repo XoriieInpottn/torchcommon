@@ -15,7 +15,7 @@ class AdamX(Optimizer):
             betas=(0.9, 0.999),
             eps=1e-8,
             weight_decay=0.3,
-            gamma=0.8,
+            gamma=0.3,
             amsgrad=False
     ) -> None:
         if not 0.0 <= lr:
