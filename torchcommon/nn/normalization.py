@@ -7,104 +7,56 @@
 
 import torch
 from torch import nn
-from torch.nn import init
 
-
-class LayerNorm(nn.Module):
-
-    def __init__(self,
-                 feature_size: int,
-                 eps: float = 1e-5,
-                 affine: bool = True,
-                 device=None,
-                 dtype=None):
-        super(LayerNorm, self).__init__()
-        factory_kwargs = {'device': device, 'dtype': dtype}
-        self._feature_size = feature_size
-        self._eps = eps
-        self._affine = affine
-
-        if self._affine:
-            self.weight = nn.Parameter(torch.empty(feature_size, 1, **factory_kwargs))
-            self.bias = nn.Parameter(torch.empty(feature_size, 1, **factory_kwargs))
-        else:
-            self.register_parameter('weight', None)
-            self.register_parameter('bias', None)
-
-        self.reset_parameters()
-
-    def reset_parameters(self):
-        if self._affine:
-            init.ones_(self.weight)
-            init.zeros_(self.bias)
-
-    def forward(self, x: torch.Tensor):
-        shape = x.shape
-        n, c = shape[0], shape[1]
-        x = x.view((n, c, -1))
-        mean = x.mean((1, 2), keepdim=True)
-        var = x.square().mean((1, 2), keepdim=True) - mean.square()
-        x = (x - mean) / (var + self._eps).sqrt()
-        x = self.weight * x + self.bias
-        x = x.view(shape)
-        return x
+__all__ = [
+    'AdaptiveGroupNorm'
+]
 
 
 class AdaptiveGroupNorm(nn.Module):
 
-    def __init__(self,
-                 feature_size: int,
-                 num_groups: int = 32,
-                 eps: float = 1e-5,
-                 affine: bool = True,
-                 device=None,
-                 dtype=None):
+    def __init__(
+            self,
+            num_groups: int,
+            num_channels: int,
+            eps: float = 1e-5,
+            affine: bool = True,
+            device=None,
+            dtype=None
+    ) -> None:
         super(AdaptiveGroupNorm, self).__init__()
-        factory_kwargs = {'device': device, 'dtype': dtype}
-        self._feature_size = feature_size
-        self._num_groups = num_groups
-        self._eps = eps
-        self._affine = affine
+        small_group_size = num_channels // num_groups
+        big_group_size = small_group_size + 1
 
-        self._group_size = feature_size // num_groups
-        self._big_group_index = (self._group_size + 1) * (feature_size % num_groups)
+        self.num_groups_big = num_channels % num_groups
+        self.num_channels_big = big_group_size * self.num_groups_big
+        self.norm_big = nn.GroupNorm(
+            self.num_groups_big,
+            self.num_channels_big,
+            eps=eps,
+            affine=affine,
+            device=device,
+            dtype=dtype
+        ) if self.num_groups_big != 0 else None
 
-        if self._affine:
-            self.weight = nn.Parameter(torch.empty(feature_size, 1, **factory_kwargs))
-            self.bias = nn.Parameter(torch.empty(feature_size, 1, **factory_kwargs))
-        else:
-            self.register_parameter('weight', None)
-            self.register_parameter('bias', None)
-
-        self.reset_parameters()
-
-    def reset_parameters(self):
-        if self._affine:
-            init.ones_(self.weight)
-            init.zeros_(self.bias)
+        self.num_groups = num_groups - self.num_groups_big
+        self.num_channels = num_channels - self.num_channels_big
+        self.norm = nn.GroupNorm(
+            self.num_groups,
+            self.num_channels,
+            eps=eps,
+            affine=affine,
+            device=device,
+            dtype=dtype
+        )
 
     def forward(self, x: torch.Tensor):
-        shape = x.shape
-        n, c = shape[0], shape[1]
-        x = x.view((n, c, -1))
-        if self._big_group_index > 0:
-            x1 = x[:, :self._big_group_index, :]
-            x0 = x[:, self._big_group_index:, :]
-            x1 = self._group_norm(x1, self._group_size + 1)
-            x0 = self._group_norm(x0, self._group_size)
-            x = torch.cat([x1, x0], 1)
+        if self.norm_big is None:
+            return self.norm(x)
         else:
-            x = self._group_norm(x, self._group_size)
-        x = self.weight * x + self.bias
-        x = x.view(shape)
-        return x
-
-    def _group_norm(self, x: torch.Tensor, gs: int):
-        n, d, m = x.shape
-        assert d % gs == 0
-        x = x.view((n, d // gs, gs, m))
-        mean = x.mean((2, 3), keepdim=True)
-        var = x.square().mean((2, 3), keepdim=True) - mean.square()
-        x = (x - mean) / (var + self._eps).sqrt()
-        x = x.view((n, d, m))
-        return x
+            x1 = x[:, :self.num_channels, ...]
+            x2 = x[:, self.num_channels:, ...]
+            return torch.cat([
+                self.norm(x1),
+                self.norm_big(x2)
+            ], 1)

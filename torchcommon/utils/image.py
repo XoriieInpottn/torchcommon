@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-
 import random
-from typing import Tuple, Union
+from typing import Tuple
+from typing import Union
 
 import cv2 as cv
 import imgaug.augmenters as iaa
@@ -17,8 +17,6 @@ __all__ = [
     'denormalize_image',
     'hwc_to_chw',
     'chw_to_hwc',
-    'plot_bboxes',
-    'draw_mask',
     'ResizedCrop',
     'ColorJitter',
     'Mosaic'
@@ -85,48 +83,6 @@ def chw_to_hwc(image: np.ndarray) -> np.ndarray:
         raise RuntimeError('Image should be a 3-dimensional tensor/ndarray.')
     image = np.transpose(image, (1, 2, 0))
     image = np.ascontiguousarray(image)
-    return image
-
-
-def plot_bboxes(
-        image: np.ndarray,
-        bboxes: np.ndarray,
-        num_classes: int,
-        cmap: str = 'Spectral',
-        class_map: dict = None
-) -> np.ndarray:
-    image = np.copy(image)
-    boxes, label = bboxes[:, :4], bboxes[:, 4]
-    height, width, _ = image.shape
-    boxes = boxes * (width, height, width, height)
-    boxes = boxes.astype(np.int64)
-    label = label.astype(np.int64)
-
-    from matplotlib import cm
-    cmap = cm.get_cmap(cmap)
-
-    for (x, y, w, h), l in zip(boxes, label):
-        color = np.array(cmap(l / num_classes), dtype=np.float32) * 255
-        color = [int(c) for c in color]
-        name = 'object' if class_map is None else class_map[l]
-
-        ow, oh = w // 2, h // 2
-        x1, y1, x2, y2 = x - ow, y - oh, x + ow, y + oh
-        cv.rectangle(image, (x1, y1), (x2, y2), color, 2)
-        text_size, baseline = cv.getTextSize(name, cv.FONT_HERSHEY_SIMPLEX, 0.4, 1)
-        p = (x1, y1 - text_size[1])
-        p1 = (p[0] - 2 // 2, p[1] - 2 - baseline)
-        p2 = (p[0] + text_size[0], p[1] + text_size[1])
-        cv.rectangle(image, p1, p2, color, -1)
-        cv.putText(image, name, (p[0], p[1] + baseline), cv.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1, 8)
-    return image
-
-
-def draw_mask(image: np.ndarray, mask: np.ndarray) -> np.ndarray:
-    mask = mask.astype(np.uint8)
-    mask = np.clip(mask, 0, 1) * 255
-    mask = np.stack([mask, mask, np.zeros_like(mask)], 2)
-    image = cv.addWeighted(image, 0.5, mask, 0.5, 0)
     return image
 
 
