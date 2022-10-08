@@ -15,6 +15,8 @@ __all__ = [
     'read_image',
     'normalize_image',
     'denormalize_image',
+    'hwc_to_chw',
+    'chw_to_hwc',
     'plot_bboxes',
     'draw_mask',
     'ResizedCrop',
@@ -43,32 +45,46 @@ def read_image(path_or_data):
 
 def normalize_image(
         image: np.ndarray,
-        mean=IMAGENET_MEAN,
-        std=IMAGENET_STD,
-        transpose=True
+        mean: Union[np.ndarray, float] = IMAGENET_MEAN,
+        std: Union[np.ndarray, float] = IMAGENET_STD,
+        transpose=False
 ) -> np.ndarray:
     image = np.array(image, dtype=np.float32)
     image -= mean
     image /= std
     if transpose:
-        image = np.transpose(image, (2, 0, 1))
-        image = np.ascontiguousarray(image)
+        image = hwc_to_chw(image)
     return image
 
 
 def denormalize_image(
         image: np.ndarray,
-        mean=IMAGENET_MEAN,
-        std=IMAGENET_STD,
-        transpose=True
+        mean: Union[np.ndarray, float] = IMAGENET_MEAN,
+        std: Union[np.ndarray, float] = IMAGENET_STD,
+        transpose=False
 ) -> np.ndarray:
     if transpose:
-        image = np.transpose(image, (1, 2, 0))
-        image = np.ascontiguousarray(image)
+        image = chw_to_hwc(image)
     image *= std
     image += mean
     np.clip(image, 0, 255, out=image)
     image = np.array(image, dtype=np.uint8)
+    return image
+
+
+def hwc_to_chw(image: np.ndarray) -> np.ndarray:
+    if len(image.shape) != 3:
+        raise RuntimeError('Image should be a 3-dimensional tensor/ndarray.')
+    image = np.transpose(image, (2, 0, 1))
+    image = np.ascontiguousarray(image)
+    return image
+
+
+def chw_to_hwc(image: np.ndarray) -> np.ndarray:
+    if len(image.shape) != 3:
+        raise RuntimeError('Image should be a 3-dimensional tensor/ndarray.')
+    image = np.transpose(image, (1, 2, 0))
+    image = np.ascontiguousarray(image)
     return image
 
 
