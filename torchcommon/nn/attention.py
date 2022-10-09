@@ -12,7 +12,6 @@ from torch import nn
 from torch.nn import functional as F
 
 from .functional import softmax_with_mask
-from .normalization import LayerNorm
 
 
 class BiLinearAttention(nn.Module):
@@ -101,7 +100,7 @@ class MLPAttention(nn.Module):
             out_features=attention_size,
             bias=bias
         )
-        self.norm = LayerNorm((attention_size,)) if norm else None
+        self.norm = nn.LayerNorm(attention_size) if norm else None
         self.non_lin = nn.ReLU(inplace=True)
         self.attention_layer = nn.Linear(
             in_features=attention_size,
