@@ -54,8 +54,14 @@ class BaseConfig(object):
 
     def _get_attributes(self):
         d = {}
-        for name, value in self.__class__.__dict__.items():
-            d[name] = value
+        class_list = []
+        base = self.__class__
+        while base is not BaseConfig:
+            class_list.append(base)
+            base = base.__base__
+        for clazz in reversed(class_list):
+            for name, value in clazz.__dict__.items():
+                d[name] = value
         for name, value in self.__dict__.items():
             d[name] = value
         return d
