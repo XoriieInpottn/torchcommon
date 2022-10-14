@@ -39,6 +39,7 @@ if __name__ == '__main__':
             'numpy',
             'imgaug',
             'opencv-python',
-            'sklearn'
+            'sklearn',
+            'docset'
         ]
     )
