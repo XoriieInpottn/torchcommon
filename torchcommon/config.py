@@ -3,20 +3,9 @@
 import io
 
 __all__ = [
-    'Option',
     'get_options',
     'BaseConfig'
 ]
-
-
-class Option(object):
-
-    def __init__(self, value, type=None, help=None):
-        self.value = value
-        self.type = type
-        self.help = help
-        if self.type is None and self.value is not None:
-            self.type = self.value.__class__
 
 
 def get_options(obj):
@@ -37,8 +26,6 @@ class BaseConfig(object):
 
     def __init__(self, args=None):
         for name, value in get_options(self).items():
-            if isinstance(value, Option):
-                value = value.value
             setattr(self, name, value)
 
         if args is not None:
