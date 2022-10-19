@@ -17,6 +17,7 @@ __all__ = [
     'denormalize_image',
     'hwc_to_chw',
     'chw_to_hwc',
+    'RandomCropToSquare',
     'ResizedCrop',
     'ColorJitter',
     'Mosaic'
@@ -84,6 +85,35 @@ def chw_to_hwc(image: np.ndarray) -> np.ndarray:
     image = np.transpose(image, (1, 2, 0))
     image = np.ascontiguousarray(image)
     return image
+
+
+class RandomCropToSquare(iaa.Sequential):
+
+    def __init__(
+            self,
+            size: int,
+            scale: float = 1.0,
+            pad: float = 0.0,
+            pad_to_square=False,
+            cval: int = 0,
+            interpolation: str = 'area',
+            train=True
+    ) -> None:
+        if train:
+            size_ = (size, int(size * scale)) if scale is not None and scale != 1.0 else size
+            super(RandomCropToSquare, self).__init__([
+                iaa.PadToSquare(pad_cval=cval) if pad_to_square else iaa.Identity(),
+                iaa.Resize({'shorter-side': size_, 'longer-side': 'keep-aspect-ratio'}, interpolation),
+                iaa.Pad(percent=pad, pad_cval=cval,
+                        keep_size=False) if pad is not None and pad > 0.0 else iaa.Identity(),
+                iaa.CropToFixedSize(size, size)
+            ])
+        else:
+            super(RandomCropToSquare, self).__init__([
+                iaa.PadToSquare(pad_cval=cval) if pad_to_square else iaa.Identity(),
+                iaa.Resize({'shorter-side': size, 'longer-side': 'keep-aspect-ratio'}, interpolation),
+                iaa.CenterCropToSquare()
+            ])
 
 
 class ResizedCrop(iaa.Sequential):
